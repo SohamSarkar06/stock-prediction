@@ -4,53 +4,111 @@
   <title>Indian Stock Predictor</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       flex-direction: row;
       max-width: 1200px;
       margin: auto;
       padding: 20px;
-      background-color: rgb(100, 100, 176);
+      background-color: #0d1117;
+      color: #c9d1d9;
     }
-      
 
     .main {
       flex: 2;
-      padding-right: 20px;
-      background-color: rgb(212, 212, 231);
+      margin-right: 20px;
+      background-color: #161b22;
       border-radius: 10px;
-      padding: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
     }
+
     .sidebar {
       flex: 1;
-      border-left: 1px solid #ccc;
+      border-left: 1px solid #30363d;
       padding-left: 20px;
       max-height: 90vh;
-      overflow-y: scroll;
-      padding: 5px;
-
+      overflow-y: auto;
+      background-color: #161b22;
+      border-radius: 10px;
+      padding: 15px;
     }
+
     input, button {
       padding: 10px;
       margin: 10px 0;
       width: 100%;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
     }
-    canvas {
-      max-width: 100%;
+
+    input {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
     }
-    .stock-item {
+
+    button {
+      background-color: #238636;
+      color: white;
       cursor: pointer;
-      padding: 8px;
-      border-bottom: 1px solid #eee;
-    }
-    .stock-item:hover {
-      background-color: #f0f0f0;
-    }
-    .stock-symbol {
       font-weight: bold;
     }
-    #search{
-        max-width: 97%;
+
+    button:hover {
+      background-color: #2ea043;
+    }
+
+    canvas {
+      max-width: 100%;
+      background-color: #0d1117;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .stock-item {
+      cursor: pointer;
+      padding: 10px;
+      border-bottom: 1px solid #30363d;
+      color: #c9d1d9;
+      border-radius: 5px;
+    }
+
+    .stock-item:hover {
+      background-color: #21262d;
+    }
+
+    .stock-symbol {
+      font-weight: bold;
+      color: #58a6ff;
+    }
+
+    #search {
+      max-width: 97%;
+    }
+
+    h2, h3 {
+      color: #58a6ff;
+    }
+
+    #output {
+        
+      margin-top: 10px;
+      font-size: 16px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: #30363d;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: #0d1117;
     }
   </style>
 </head>
