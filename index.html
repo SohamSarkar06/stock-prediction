@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Indian Stock Predictor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: row;
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+      background-color: rgb(100, 100, 176);
+    }
+      
+
+    .main {
+      flex: 2;
+      padding-right: 20px;
+      background-color: rgb(212, 212, 231);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .sidebar {
+      flex: 1;
+      border-left: 1px solid #ccc;
+      padding-left: 20px;
+      max-height: 90vh;
+      overflow-y: scroll;
+      padding: 5px;
+
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+    }
+    canvas {
+      max-width: 100%;
+    }
+    .stock-item {
+      cursor: pointer;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    .stock-item:hover {
+      background-color: #f0f0f0;
+    }
+    .stock-symbol {
+      font-weight: bold;
+    }
+    #search{
+        max-width: 97%;
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <h2 > Indian Stock Growth Predictor</h2>
+    
+    <input id="search" list="stocks" placeholder="Enter NSE stock symbol (e.g., RELIANCE)" />
+    <datalist id="stocks"></datalist>
+    <button onclick="predictStock()">Predict</button>
+    <div id="output"></div>
+    <canvas id="chart"></canvas>
+  </div>
+
+  <div class="sidebar">
+    <h3> Stock List (Click to Predict)</h3>
+    <div id="stock-container" style="border: 1px solid #686464; padding: 10px;"></div>
+    
+  </div>
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const backendUrl = 'https://a44f3ecbd777.ngrok-free.app'; // Replace with your actual backend
+    const FMP_API_KEY = '9zpvOWMyTzEXBaQDQTLwzuGLiwGH25C7'; // Replace with your real key
+
+    async function loadStockList() {
+      try {
+        const res = await fetch(`https://financialmodelingprep.com/api/v3/stock/list?apikey=${FMP_API_KEY}`);
+        const data = await res.json();
+
+        const datalist = document.getElementById('stocks');
+        const stockContainer = document.getElementById('stock-container');
+
+        const nseStocks = data.filter(stock =>
+          stock.exchangeShortName === 'NSE' &&
+          stock.price && !isNaN(stock.price)
+        );
+
+        nseStocks.slice(0, 200).forEach(stock => {
+          // Add to datalist for autocomplete
+          const option = document.createElement('option');
+          option.value = stock.symbol;
+          datalist.appendChild(option);
+
+          // Add to sidebar list
+          const div = document.createElement('div');
+          div.className = 'stock-item';
+          div.innerHTML = `<span class="stock-symbol">${stock.symbol}</span> — ₹${parseFloat(stock.price).toFixed(2)}<br><small>${stock.name}</small>`;
+         div.onclick = () => {
+  const cleanSymbol = stock.symbol.replace('.NS', '').toUpperCase().trim();
+  document.getElementById('search').value = cleanSymbol;
+  predictStock();
+};
+
+
+          stockContainer.appendChild(div);
+        });
+      } catch (error) {
+        console.error(error);
+        document.getElementById('stock-container').innerText = '❌ Failed to load stock list.';
+      }
+    }
+
+    function predictStock() {
+  const symbol = document.getElementById('search').value.toUpperCase();
+  const output = document.getElementById('output');
+  output.innerHTML = "⏳ Fetching prediction...";
+
+  fetch(backendUrl + "/predict", {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ symbol })
+  })
+  .then(res => res.json())
+  .then(data => {
+  if (data.error) {
+    output.innerHTML = "❌ " + data.error;
+    return;
+  }
+
+  console.log("Received prediction data:", data); // Add this for debugging
+
+  output.innerHTML = `📈 <b>${symbol}</b> Last Price: ₹${data.last_price.toFixed(2)}`;
+  drawChart(data.dates, data.predicted_prices);
+})
+}
+
+
+function drawChart(labels, predictions) {
+  console.log("Labels:", labels);
+  console.log("Predictions:", predictions);
+
+  if (!Array.isArray(predictions) || predictions.some(p => typeof p !== 'number')) {
+    alert("❌ Invalid prediction data received.");
+    return;
+  }
+
+  const ctx = document.getElementById('chart').getContext('2d');
+  if (window.stockChart) window.stockChart.destroy();
+
+  window.stockChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Predicted Price (Next 30 Days)',
+        data: predictions,
+        borderColor: 'green',
+        backgroundColor: 'rgba(0,255,0,0.1)',
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true }
+      }
+    }
+  });
+}
+
+
+
+window.onload = () => {
+  loadStockList();
+  
+  };
+
+
+   
+  </script>
+</body>
+</html>
